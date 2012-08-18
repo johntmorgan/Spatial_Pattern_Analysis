@@ -2,7 +2,7 @@
 ##in Morgan et al., 2012. The program examines the distribution of cellular 
 ##populations in a region of cortex or other layered tissue to determine whether they 
 ##are randomly spaced or instead more or less closely clustered together than expected. 
-##For a homogenous, non-layered sample, please see SpatialPattern_NoLayer.py.
+##For a homogeneous, non-layered sample, please see SpatialPattern_NoLayer.py.
 
 ##Summary of method:
 ##This program looks at the recorded x, y-coordinates of each cell in a region of interest.

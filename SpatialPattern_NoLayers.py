@@ -2,7 +2,7 @@
 ##in Morgan et al., 2012. The program examines the distribution of cellular or other 
 ##populations to determine whether they are randomly spaced or instead more or less closely 
 ##clustered together than expected. This version assumes no layer information (i.e. a tissue 
-##sample without cortical layers). For a non-homogenous, layered sample, please see 
+##sample without cortical layers). For a non-homogeneous, layered sample, please see 
 ##SpatialPatternRefactor.py.
 
 ##Summary of method:
