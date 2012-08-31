@@ -46,10 +46,11 @@
 # Record coordinates of all cells belonging to the populations of interest in 
 # a rectangular counting frame in Stereo Investigator.  Take the raw cellular 
 # coordinates and save as a .txt file. Open the text file.  Leave the header 
-# in.  Delete the information in columns 4 and 5.  Add layer information for 
-# each cell in column 4.  (Do a y-coordinate sort on the data, then fill in 
-# the column with reference to the Stereo Investigator file.)  Save, set your 
-# variables in the section below, and run the program.
+# in.  Delete the information in columns 4 and 5.  If your data set has 
+# layers, add layer information for each cell in column 4.  (Do a y-coordinate 
+# sort on the data, then fill in the column with reference to the Stereo 
+# Investigator file.)  Save, set your variables in the section below, and run 
+# the program.
 
 ##############################################################################
 # User set variables here
@@ -68,13 +69,17 @@ outputfile = "test"
 
 # This variable adjusts the cell types that are being compared.  Input the 
 # values in the first column of your saved .txt file.  In the demo run, 
-# neuron = 1, microglia = 3.  To look at the properties of a single 
+# neuron = 1, microglia = 3.  To examine the spatial organization of a single 
 # population, set both of these values the same.
 cell1 = 1
 cell2 = 3
 
-# Number of cortical layers, this is used to randomize cell distributions by 
-# layer
+# If the data set has layers, set the variable layers to True. Otherwise, set
+# it to False. If the data set has layers, set layer_num to the number of 
+# layers. This is used to randomize cell distributions by layer. See the file 
+# preparation section above for instructions on adding layer data to 
+# your Stereo Investigator output file.
+layers = True
 layer_num = 6
 
 # This variable sets distance from the ROI boundary at which seed cells will 
@@ -118,8 +123,15 @@ def loadfile():
     myfileobj = open(path,"r") 
     csv_read = csv.reader(myfileobj,dialect = csv.excel_tab)
     sp_data = []
-    for line in csv_read:
-        sp_data.append(line[0:4])
+    if layers:
+        for line in csv_read:
+            sp_data.append(line[0:4])
+    else:
+        for line in csv_read:
+            sp_data.append(line[0:3])
+        for cell in sp_data:
+            cell.append(1)
+    print sp_data[1]
     sp_data = sp_data[1:]
     for cell in sp_data:
         cell[0], cell[1] = int(cell[0]), float(cell[1]) 
@@ -224,11 +236,16 @@ def cluster_average(cluster1, cluster2):
 def sim_gen(sp_data, xmin, xmax, ybound_list):
     """Make a simulated version of the cell distribution with random locations"""
     sim_data = []
-    for cell in sp_data:
-        yrand = random.uniform(ybound_list[cell[3]-1][0], 
-                               ybound_list[cell[3]-1][1])
-        sim_data.append([cell[0], random.uniform(xmin, xmax), yrand, 
-                          cell[3]])
+    if layers:
+        for cell in sp_data:
+            yrand = random.uniform(ybound_list[cell[3]-1][0], 
+                                   ybound_list[cell[3]-1][1])
+            sim_data.append([cell[0], random.uniform(xmin, xmax), yrand, 
+                              cell[3]])
+    else:
+        for cell in sp_data:
+            sim_data.append([cell[0], random.uniform(xmin, xmax), 
+                             random.uniform(ymin, ymax), cell[3]])
     return sim_data
 
 
@@ -298,7 +315,10 @@ else:
 print "raw clustering value: "
 print raw_cluster
 
-ybound_list = layer_ybound(sp_data_mod, ymin, ymax)
+if layers:
+    ybound_list = layer_ybound(sp_data_mod, ymin, ymax)
+else:
+    ybound_list = []
 sim_cluster = sim_iterate(sim_run_num, sp_data_mod, cell1, cell2, 
                           xmin, xmax, ymin, ymax, ybound_list)
 print "simulation clustering value:"
