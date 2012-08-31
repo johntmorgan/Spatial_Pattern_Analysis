@@ -62,7 +62,7 @@ directory = r"c:\Documents and Settings\Administrator\Desktop\Spacing UMB Raw"
 # There should be a header, leave it in.
 # Delete z-axis data and input layer information for each cell.
 # Save as a tab-delimited text file.
-inputfile = r"B4925.txt"
+inputfile = r"NoLayer_B4925.txt"
 
 # This is the name of the .xls file that the program will save when finished. 
 outputfile = "test"
@@ -79,7 +79,7 @@ cell2 = 3
 # layers. This is used to randomize cell distributions by layer. See the file 
 # preparation section above for instructions on adding layer data to 
 # your Stereo Investigator output file.
-layers = True
+layers = False
 layer_num = 6
 
 # This variable sets distance from the ROI boundary at which seed cells will 
@@ -131,7 +131,6 @@ def loadfile():
             sp_data.append(line[0:3])
         for cell in sp_data:
             cell.append(1)
-    print sp_data[1]
     sp_data = sp_data[1:]
     for cell in sp_data:
         cell[0], cell[1] = int(cell[0]), float(cell[1]) 
