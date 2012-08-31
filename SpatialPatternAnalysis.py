@@ -62,7 +62,7 @@ directory = r"c:\Documents and Settings\Administrator\Desktop\Spacing UMB Raw"
 # There should be a header, leave it in.
 # Delete z-axis data and input layer information for each cell.
 # Save as a tab-delimited text file.
-inputfile = r"NoLayer_B4925.txt"
+inputfile = r"B4925.txt"
 
 # This is the name of the .xls file that the program will save when finished. 
 outputfile = "test"
@@ -79,7 +79,7 @@ cell2 = 3
 # layers. This is used to randomize cell distributions by layer. See the file 
 # preparation section above for instructions on adding layer data to 
 # your Stereo Investigator output file.
-layers = False
+layers = True
 layer_num = 6
 
 # This variable sets distance from the ROI boundary at which seed cells will 
@@ -201,24 +201,22 @@ def cluster(sp_data, cell1, cell2):
     """Generate clustering values.
     This function is the main time sink of the program right now."""
     print "cluster in: " + str(time.clock())
+    class1_cells = [cell for cell in sp_data if cell[0] == cell1]
+    class2_cells = [cell for cell in sp_data if cell[0] == cell2]
     raw_cluster = [0.] * (analysis_dist)
-    for cell in sp_data:
-        if cell[0] == cell1:
-            if (cell[4] > exclude_dist and cell[5] > exclude_dist and 
-                cell[6] > exclude_dist and cell[7] > exclude_dist):
-                # Setting these variables here shaves ~7-8% off runtime
-                xloc = cell[1]
-                yloc = cell[2]
-                for compare_cell in sp_data:
-                    if compare_cell[0] == cell2:
-                        dist = math.sqrt((xloc - compare_cell[1])**2 + 
-                                         (yloc - compare_cell[2])**2)
-                        if dist > 0 and dist < analysis_dist:
-                            array_target = int(math.ceil(dist * 
-                                                         (analysis_dist - 1) / 
-                                                         interval_num))
-                            for insert in range (array_target, analysis_dist):
-                                raw_cluster[insert] += 1
+    for cell1 in class1_cells:
+        if (cell1[4] > exclude_dist and cell1[5] > exclude_dist and 
+            cell1[6] > exclude_dist and cell1[7] > exclude_dist):
+            # Setting these variables here shaves ~7-8% off runtime
+            xloc = cell1[1]
+            yloc = cell1[2]
+            for cell2 in class2_cells:
+                dist = math.sqrt((xloc - cell2[1])**2 + (yloc - cell2[2])**2)
+                if dist > 0 and dist < analysis_dist:
+                    array_target = int(math.ceil(dist * (analysis_dist - 1) / 
+                                                 interval_num))
+                    for insert in range (array_target, analysis_dist):
+                        raw_cluster[insert] += 1
     print "cluster out: " + str(time.clock())
     return raw_cluster
 
