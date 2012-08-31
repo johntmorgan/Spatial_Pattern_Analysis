@@ -55,7 +55,7 @@
 # User set variables here
 
 # Directory containing input files
-directory = r"C:\Users\John Morgan\My Documents\sp_datafiles"
+directory = r"c:\Documents and Settings\Administrator\Desktop\Spacing UMB Raw"
 
 # Name of cell coordinate data file from Stereo Investigator. 
 # There should be a header, leave it in.
@@ -110,9 +110,10 @@ import time
 import xlwt
 
 
-# Load and cleanup file. Output is sp_data, which contains all cells. 
-# Output is [[celltype1, xcoord1, ycoord1],[celltype2, xcoord2, ycoord2], etc]
 def loadfile():
+    """Load and cleanup file. Output is sp_data, which contains all cells. 
+    Output is [[celltype1, xcoord1, ycoord1],[celltype2, xcoord2, ycoord2], 
+    etc]"""
     path = directory + "\\" + inputfile
     myfileobj = open(path,"r") 
     csv_read = csv.reader(myfileobj,dialect = csv.excel_tab)
@@ -126,10 +127,10 @@ def loadfile():
     return sp_data
 
 
-# This function finds the max and min x and y ROI boundaries in the data file.
-# The data file is modified so that the distance of each cell from these 
-# boundaries is recorded in positions cell[4] - cell[7].
 def boundaries(sp_data):
+    """ This function finds the max and min x and y ROI boundaries in the data 
+    file. The data file is modified so that the distance of each cell from 
+    these boundaries is recorded in positions cell[4] - cell[7]."""
     (xmin, ymin, xmax, ymax) = (sp_data[0][1], sp_data[0][2], 
                                 sp_data[0][1], sp_data[0][2])
     for cell in sp_data:
@@ -153,10 +154,10 @@ def boundaries(sp_data):
     return sp_data, xmin, xmax, ymin, ymax
 
 
-# This function sets boundaries by layer so that when random cell location 
-# simulations are generated, they are performed by layer.  This is necessary 
-# because cell density varies by layer.
 def layer_ybound(sp_data_mod, ymin, ymax):
+    """This function sets boundaries by layer so that when random cell 
+    location simulations are generated, they are performed by layer.  
+    This is necessary because cell density varies by layer."""
     ybound_list = []
     for layer in xrange(layer_num):
         layer_list = []
@@ -185,9 +186,9 @@ def layer_ybound(sp_data_mod, ymin, ymax):
     return ybound_list
 
 
-# Generate clustering values.
-# This function is the main time sink of the program right now. 
 def cluster(sp_data, cell1, cell2):
+    """Generate clustering values.
+    This function is the main time sink of the program right now."""
     print "cluster in: " + str(time.clock())
     raw_cluster = [0.] * (analysis_dist)
     for cell in sp_data:
@@ -211,17 +212,17 @@ def cluster(sp_data, cell1, cell2):
     return raw_cluster
 
 
-# Average together the results of the two runs (one from the "perspective" of 
-# each cell type).
 def cluster_average(cluster1, cluster2):
+    """ Average together the results of the two runs (one from the "perspective" of 
+    each cell type)."""
     for interval in xrange(analysis_dist):
         cluster1[interval] = (float(cluster1[interval]) + 
                               float(cluster2[interval]))/2
     return cluster1
 
 
-# Make a simulated version of the cell distribution with random locations
 def sim_gen(sp_data, xmin, xmax, ybound_list):
+    """Make a simulated version of the cell distribution with random locations"""
     sim_data = []
     for cell in sp_data:
         yrand = random.uniform(ybound_list[cell[3]-1][0], 
@@ -231,9 +232,9 @@ def sim_gen(sp_data, xmin, xmax, ybound_list):
     return sim_data
 
 
-# Modified version of boundaries function so as not to reset boundaries smaller 
-# in simulation runs
 def sim_boundaries(sim_data, xmin, xmax, ymin, ymax):
+    """Modified version of boundaries function so as not to reset boundaries 
+    smaller in simulation runs"""
     for cell in sim_data:
         xmin_dist = abs(cell[1] - xmin)
         xmax_dist = abs(xmax - cell[1])
@@ -246,12 +247,12 @@ def sim_boundaries(sim_data, xmin, xmax, ymin, ymax):
     return sim_data
 
 
-# This is the main function that runs simulations of cellular location
 def sim_iterate(sim_run_num, sp_data_mod, cell1, cell2, xmin, xmax, ymin, 
                 ymax, ybound_list):
+    """This is the main function that runs simulations of cellular location"""
     sim_track = [0.] * (analysis_dist) 
     for runcount in xrange(sim_run_num):
-        print runcount + 1
+        print "simulation run " + str(runcount + 1)
         sim_raw = sim_boundaries(sim_gen(sp_data_mod, xmin, xmax, 
                                          ybound_list), xmin, xmax, 
                                                        ymin, ymax)
@@ -269,8 +270,8 @@ def sim_iterate(sim_run_num, sp_data_mod, cell1, cell2, xmin, xmax, ymin,
     return sim_track
 
 
-# Use simulation output to density-correct clustering data
 def sim_correct(raw_cluster, sim_cluster):
+    """Use simulation output to density-correct clustering data"""
     corrected_output = [0.] * (analysis_dist)
     for location in xrange(analysis_dist):
         try:
@@ -309,7 +310,7 @@ print sp_output
 
 print "run time: " + str(time.clock())
 
-# Set up worksheet to write to
+# Set up worksheet to write results to
 book = xlwt.Workbook(encoding="utf-8")
 sheet1 = book.add_sheet("Python Sheet 1")
 
