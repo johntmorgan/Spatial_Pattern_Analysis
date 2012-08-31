@@ -341,20 +341,3 @@ for location in xrange(analysis_dist):
 # Save the spreadsheet
 savepath = directory + "\\" + outputfile + ".xls"
 book.save(savepath)
-
-
-#key = sp_data[0][0]
-#coords = sp_data[0][1:7]
-#coords2 = sp_data[1][1:7]
-#test_dict = {}
-#test_dict[key].append(coords)
-#test_dict[key].append(coords2)
-#print test_dict
-#print test_dict[key][1]
-#sp_dict = dict((sp_data[cell][0], sp_data[cell][1:7]) for cell in sp_data)
-
-#cells_dict = dict(sp_data[0][sp_data[1:8]] for _ in xrange(len sp_data)))
-#print cells_dict[cell1]
-#print len(cells_dict[cell1])
-#print cells_dict[cell2]
-#print len(cells_dict[cell2])
