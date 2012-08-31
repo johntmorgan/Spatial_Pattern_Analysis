@@ -111,6 +111,7 @@ import csv
 import math
 import random
 import time
+from collections import defaultdict
 
 import xlwt
 
@@ -201,16 +202,17 @@ def cluster(sp_data, celltype1, celltype2):
     """Generate clustering values.
     This function is the main time sink of the program right now."""
     print "cluster in: " + str(time.clock())
-    class1_cells = [cell for cell in sp_data if cell[0] == celltype1]
-    class2_cells = [cell for cell in sp_data if cell[0] == celltype2]
+    sp_dict = defaultdict(list)
+    for cell in sp_data:
+        sp_dict[cell[0]].append(cell[0:8])
     raw_cluster = [0.] * (analysis_dist)
-    for cell1 in class1_cells:
+    for cell1 in sp_dict[celltype1]:
         if (cell1[4] > exclude_dist and cell1[5] > exclude_dist and 
             cell1[6] > exclude_dist and cell1[7] > exclude_dist):
             # Setting these variables here shaves ~7-8% off runtime
             xloc = cell1[1]
             yloc = cell1[2]
-            for cell2 in class2_cells:
+            for cell2 in sp_dict[celltype2]:
                 dist = math.sqrt((xloc - cell2[1])**2 + (yloc - cell2[2])**2)
                 if dist > 0 and dist < analysis_dist:
                     array_target = int(math.ceil(dist * (analysis_dist - 1) / 
@@ -222,8 +224,8 @@ def cluster(sp_data, celltype1, celltype2):
 
 
 def cluster_average(cluster1, cluster2):
-    """ Average together the results of the two runs (one from the 
-    "perspective" of each cell type)."""
+    """ Average together the results of the two runs (one from the "perspective" of 
+    each cell type)."""
     for interval in xrange(analysis_dist):
         cluster1[interval] = (float(cluster1[interval]) + 
                               float(cluster2[interval]))/2
@@ -231,8 +233,7 @@ def cluster_average(cluster1, cluster2):
 
 
 def sim_gen(sp_data, xmin, xmax, ybound_list):
-    """Make a simulated version of the cell distribution with random 
-    locations"""
+    """Make a simulated version of the cell distribution with random locations"""
     sim_data = []
     if layers:
         for cell in sp_data:
@@ -274,10 +275,8 @@ def sim_iterate(sim_run_num, sp_data_mod, celltype1, celltype2, xmin, xmax,
         if celltype1 == celltype2:
             sim_cluster = cluster(sim_raw, celltype1, celltype1)
         else:
-            sim_cluster = cluster_average(cluster(sim_raw, celltype1, 
-                                                  celltype2), 
-                                          cluster(sim_raw, celltype2, 
-                                                  celltype1))
+            sim_cluster = cluster_average(cluster(sim_raw, celltype1, celltype2), 
+                                          cluster(sim_raw, celltype2, celltype1))
 
         for location in xrange(analysis_dist):
             sim_track[location] = (sim_track[location] + 
@@ -342,3 +341,20 @@ for location in xrange(analysis_dist):
 # Save the spreadsheet
 savepath = directory + "\\" + outputfile + ".xls"
 book.save(savepath)
+
+
+#key = sp_data[0][0]
+#coords = sp_data[0][1:7]
+#coords2 = sp_data[1][1:7]
+#test_dict = {}
+#test_dict[key].append(coords)
+#test_dict[key].append(coords2)
+#print test_dict
+#print test_dict[key][1]
+#sp_dict = dict((sp_data[cell][0], sp_data[cell][1:7]) for cell in sp_data)
+
+#cells_dict = dict(sp_data[0][sp_data[1:8]] for _ in xrange(len sp_data)))
+#print cells_dict[cell1]
+#print len(cells_dict[cell1])
+#print cells_dict[cell2]
+#print len(cells_dict[cell2])
