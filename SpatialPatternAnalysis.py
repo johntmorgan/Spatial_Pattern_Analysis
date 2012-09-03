@@ -21,8 +21,8 @@
 
 ##############################################################################
 # Section 1: setting up your computer to run this program
-# This program is written in Python 2.6-2.7.  It also uses the xlwt addon 
-# library to make Excel spreadsheets.
+# This program is written in Python 2.6-2.7.
+# For a large speed boost, try installing PyPy 1.9 as a replacement.
 
 # Step 1: Install Python 2.7.3 from here: 
 # http://www.python.org/download/releases/2.7.3/
@@ -30,14 +30,7 @@
 # Windows installed, x86-64 if you have 64-bit Windows installed.)
 # I suggest using the default option, which will install Python to c:/Python27
 
-# Step 2: Install the xlwt library from here: 
-# http://pypi.python.org/pypi/xlwt/
-# Use the program WinRAR to unzip the files to a directory
-# Go to "run" in the start menu and type cmd
-# Type cd c:\directory_where_xlwt_was_unzipped_to
-# Type setup.py install
-
-# Step 3: Copy this program into the c:/Python27 directory
+# Step 2: Copy this program into the c:/Python27 directory
 # You can also put it into any directory that is added to the correct PATH.
 
 ##############################################################################
@@ -56,7 +49,7 @@
 # User set variables here
 
 # Directory containing input files
-directory = r"c:\Documents and Settings\Administrator\Desktop\Spacing UMB Raw"
+directory = r"C:\Users\John Morgan\Documents\sp_datafiles"
 
 # Name of cell coordinate data file from Stereo Investigator. 
 # There should be a header, leave it in.
@@ -65,7 +58,7 @@ directory = r"c:\Documents and Settings\Administrator\Desktop\Spacing UMB Raw"
 inputfile = r"B4925.txt"
 
 # This is the name of the .xls file that the program will save when finished. 
-outputfile = "test"
+outputfile = r"test_output.txt"
 
 # This variable adjusts the cell types that are being compared.  Input the 
 # values in the first column of your saved .txt file.  In the demo run, 
@@ -112,16 +105,14 @@ import math
 import random
 import time
 
-import xlwt
 
-
-def loadfile():
+def load_file():
     """Load and cleanup file. Output is sp_data, which contains all cells. 
     Output is [[celltype1, xcoord1, ycoord1],[celltype2, xcoord2, ycoord2], 
     etc]"""
     path = directory + "\\" + inputfile
-    myfileobj = open(path,"r") 
-    csv_read = csv.reader(myfileobj,dialect = csv.excel_tab)
+    myfileobj = open(path, "r") 
+    csv_read = csv.reader(myfileobj, dialect=csv.excel_tab)
     sp_data = []
     if layers:
         for line in csv_read:
@@ -306,7 +297,7 @@ print time.clock()
 # analysis distance, *inclusive*.
 analysis_dist += 1 
 
-sp_data = loadfile()
+sp_data = load_file()
 sp_data_mod, xmin, xmax, ymin, ymax = boundaries(sp_data)
 
 if celltype1 == celltype2:
@@ -332,15 +323,11 @@ print sp_output
 
 print "run time: " + str(time.clock())
 
-# Set up worksheet to write results to
-book = xlwt.Workbook(encoding="utf-8")
-sheet1 = book.add_sheet("Python Sheet 1")
-
-# Populate excel worksheet with headers and results
+dist_labels = []
 for location in xrange(analysis_dist):
-    sheet1.write(0, location, (str(location) + " um"))
-    sheet1.write(1, location, sp_output[location])
-
-# Save the spreadsheet
-savepath = directory + "\\" + outputfile + ".xls"
-book.save(savepath)
+    dist_labels.append(str(location) + " um")
+out_path = directory + "\\" + outputfile
+output_writer = csv.writer(open(out_path, 'w'), delimiter='\t', quotechar='|',
+                           quoting=csv.QUOTE_MINIMAL)
+output_writer.writerow(dist_labels)
+output_writer.writerow(sp_output)
