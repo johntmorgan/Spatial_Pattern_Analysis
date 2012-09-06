@@ -99,7 +99,7 @@ sim_run_num = 5
 ##############################################################################
 # Program begins here
 
-# Import modules to handle a tab-delimited text file and produce .xls output
+# Import module to handle a tab-delimited text file
 import csv
 import math
 import random
